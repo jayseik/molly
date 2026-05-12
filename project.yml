@@ -1,0 +1,55 @@
+# Generate with: brew install xcodegen && cd /workspace && xcodegen generate
+# Open Molly.xcodeproj on macOS 14+, select scheme Molly, Run.
+
+name: Molly
+options:
+  bundleIdPrefix: app.molly
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+configs:
+  Debug: debug
+  Release: release
+
+packages: {}
+
+targets:
+  Molly:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/MollyApp
+      - path: Supporting/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_NAME: Molly
+        PRODUCT_BUNDLE_IDENTIFIER: app.molly.Molly
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026"
+        INFOPLIST_KEY_NSPrincipalClass: NSApplication
+        INFOPLIST_KEY_CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        OTHER_SWIFT_FLAGS: "$(inherited) -D MOLLY_SKU_DIRECT"
+        CODE_SIGN_ENTITLEMENTS: Supporting/MollySandbox.entitlements
+      configs:
+        Release:
+          # Apple Silicon-only direct download slice (thin arm64 binary).
+          ARCHS: arm64
+          ONLY_ACTIVE_ARCH: NO
+          ENABLE_HARDENED_RUNTIME: YES
+          DEAD_CODE_STRIPPING: YES
+    scheme:
+      testTargets: []
+
+schemes:
+  Molly:
+    build:
+      targets:
+        Molly: all
+    run:
+      config: Debug
+    archive:
+      config: Release
