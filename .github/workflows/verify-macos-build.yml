@@ -1,0 +1,43 @@
+name: Verify Release build (Apple Silicon slice)
+
+# Compiles a Release arm64 binary with ad-hoc signing for CI smoke tests only.
+# Shippable Developer ID + notarization still happens on a maintainer Mac via Scripts/build-direct-arm64.sh.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-arm64-release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build Molly (Release, arm64)
+        run: |
+          set -euo pipefail
+          xcodebuild -project Molly.xcodeproj \
+            -scheme Molly \
+            -configuration Release \
+            -derivedDataPath "${{ github.workspace }}/DerivedData" \
+            -destination 'generic/platform=macOS' \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
+            build
+
+      - name: Upload ad-hoc app (CI smoke test only)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Molly-release-arm64-adhoc
+          path: DerivedData/Build/Products/Release/Molly.app

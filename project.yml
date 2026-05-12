@@ -34,6 +34,13 @@ targets:
         INFOPLIST_KEY_CFBundleShortVersionString: "$(MARKETING_VERSION)"
         OTHER_SWIFT_FLAGS: "$(inherited) -D MOLLY_SKU_DIRECT"
         CODE_SIGN_ENTITLEMENTS: Supporting/MollySandbox.entitlements
+      configs:
+        Release:
+          # Apple Silicon-only direct download slice (thin arm64 binary).
+          ARCHS: arm64
+          ONLY_ACTIVE_ARCH: NO
+          ENABLE_HARDENED_RUNTIME: YES
+          DEAD_CODE_STRIPPING: YES
     scheme:
       testTargets: []
 
